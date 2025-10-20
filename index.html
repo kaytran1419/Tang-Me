@@ -1012,5 +1012,37 @@
     <!-- Thư viện dùng cho scene thư -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
     
+
+<script>
+/* safeguard: ensure bgm is paused on load and only plays on gift click */
+(function(){ 
+  try {
+    var a = document.getElementById('bgm');
+    if (a) {
+      // hard-stop any accidental autoplay
+      a.pause(); 
+      a.currentTime = 0;
+      // Ensure attributes do not force playback UI
+      a.removeAttribute('autoplay');
+      a.removeAttribute('controls');
+    }
+    // Ensure the box only triggers once (defensive — original logic already guards this)
+    var box = document.getElementById('giftBox');
+    if (box && a) {
+      var playedOnce = false;
+      var playHandler = function(){ 
+        if (playedOnce) return;
+        playedOnce = true;
+        try { a.volume = (typeof a.volume === 'number') ? a.volume : 0.6; } catch(e){}
+        a.play && a.play().catch(function(){});
+      };
+      box.addEventListener('click', playHandler, { passive: true });
+      box.addEventListener('pointerdown', playHandler, { passive: true });
+      box.addEventListener('touchstart', playHandler, { passive: true });
+    }
+  } catch(e) {}
+})();
+</script>
+
 </body>
 </html>
