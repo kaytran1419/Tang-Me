@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Quà 20/10 - Tặng Mẹ Yêu</title>
     <meta name="description" content="Con chúc mẹ có thật nhiều sức khỏe luôn luôn vui vẻ và hạnh phúc. Cảm ơn mẹ luôn dành những điều tốt đẹp và tình yêu thương nhất cho con. Con muốn nói với mẹ rằng là con yêu mẹ nhiều lắm! 💕">
     <!-- Open Graph for Facebook -->
@@ -515,6 +515,33 @@
               bottom: 16vh;}
         }
     </style>
+
+<style id="responsive-safe-additions">
+/* --- Responsive safe-guards (non-destructive) --- */
+html, body { height: 100%; }
+body { min-height: 100svh; margin: 0; box-sizing: border-box; overflow-x: hidden; }
+*, *::before, *::after { box-sizing: inherit; }
+/* media sizing */
+img, video, canvas, svg { max-width: 100%; height: auto; }
+/* layout containers */
+.container, .wrapper, main { max-width: 100%; width: 100%; }
+/* full-screen backgrounds */
+.hero, .section-full, .bg-cover { min-height: 100svh; background-size: cover; background-position: center; }
+/* fluid font */
+:root { --fs-base: clamp(14px, 2.2vw, 16px); }
+body { font-size: var(--fs-base); }
+/* tappable targets bounded */
+#giftBox, .gift-box, #openLetter, .open-letter {
+  max-width: min(90vw, 420px);
+  margin-inline: auto;
+  display: block;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+/* modal/overlay should never overflow viewport */
+.modal, .overlay { max-width: 100vw; max-height: 100svh; overflow: auto; }
+</style>
+
 </head>
 <body>   
 
@@ -1041,6 +1068,79 @@
       box.addEventListener('touchstart', playHandler, { passive: true });
     }
   } catch(e) {}
+})();
+</script>
+
+
+    <!-- Added: non-autoplay background music element (no controls) -->
+    <audio id="bgMusic" preload="auto" src="./music/music.mp3"></audio>
+
+<script>
+// --- User-gesture gated audio start (gift box or letter) ---
+(function() {
+  var audio = document.getElementById('bgMusic') || document.getElementById('bgm');
+  var fallback = document.getElementById('bgm');
+  var hasStarted = false;
+
+  // Defensive: stop any accidental autoplay on both elements
+  [audio, fallback].forEach(function(a){
+    if (!a) return;
+    try {
+      a.pause();
+      a.currentTime = 0;
+      a.removeAttribute('autoplay');
+      a.removeAttribute('controls');
+    } catch(e){}
+  });
+
+  function tryStartMusic() {
+    if (!audio) { audio = document.getElementById('bgMusic') || document.getElementById('bgm'); }
+    if (hasStarted || !audio) return;
+    hasStarted = true;
+
+    // Ensure only one source plays (mute/pause legacy #bgm if different)
+    if (fallback && audio !== fallback) {
+      try { fallback.pause(); fallback.currentTime = 0; fallback.muted = true; } catch(e){}
+    }
+
+    try {
+      var p = audio.play && audio.play();
+      if (p && typeof p.then === 'function') {
+        p.catch(function(err){
+          console.warn('Không thể phát nhạc ngay:', err);
+          hasStarted = false; // allow retry if blocked
+        });
+      }
+    } catch (e) {
+      console.warn('Phát nhạc lỗi:', e);
+      hasStarted = false;
+    }
+  }
+
+  // Hook targets: gift box & letter variants
+  var selectors = ['#giftBox', '.gift-box', '#openLetter', '.open-letter', '.letter'];
+  var nodes = [];
+  selectors.forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      if (nodes.indexOf(el) === -1) nodes.push(el);
+    });
+  });
+  // Attach listeners
+  nodes.forEach(function(el){
+    el.addEventListener('click', tryStartMusic, { passive: true });
+    el.addEventListener('touchstart', tryStartMusic, { passive: true });
+    // a11y + pointer
+    if (!el.hasAttribute('aria-label')) {
+      var label = (el.id === 'giftBox' || el.classList.contains('gift-box')) ? 'Mở quà' : 'Mở thư';
+      try { el.setAttribute('aria-label', label); } catch(e){}
+    }
+    if (getComputedStyle(el).cursor === 'auto') {
+      el.style.cursor = 'pointer';
+    }
+  });
+
+  // If page-specific logic plays #bgm on gift click, our listener runs after and will pause it & use #bgMusic.
+  // This keeps behavior compliant across iOS/Android/Desktop under user gesture only.
 })();
 </script>
 
