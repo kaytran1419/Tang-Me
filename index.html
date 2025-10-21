@@ -542,51 +542,6 @@ body { font-size: var(--fs-base); }
 .modal, .overlay { max-width: 100vw; max-height: 100svh; overflow: auto; }
 </style>
 
-/* ===== Fix layout thư (responsive cho mobile/tablet) ===== */
-.open-letter, #openLetter, .letter, .modal-content {
-max-width: min(90vw, 480px);
-max-height: 90svh;
-width: auto;
-height: auto;
-transform: none !important;
-margin: auto;
-border-radius: 16px;
-overflow: hidden;
-}
-
-/* Chỉnh khung modal hiển thị thư */
-.modal, .overlay {
-display: flex;
-align-items: center;
-justify-content: center;
-padding: 10px;
-background-color: rgba(0,0,0,0.5);
-box-sizing: border-box;
-}
-
-/* Giới hạn kích thước ảnh/nội dung trong thư */
-.modal-content img,
-.modal-content canvas,
-.modal-content svg {
-max-width: 100%;
-height: auto;
-}
-
-/* Cỡ chữ co giãn hài hòa */
-.modal-content p, .modal-content h1, .modal-content h2 {
-font-size: clamp(14px, 2.5vw, 18px);
-line-height: 1.5;
-}
-
-/* Giữ hiệu ứng nền mây toàn màn hình */
-.hero, .section-full, .bg-cover {
-background-size: cover;
-background-position: center;
-background-repeat: no-repeat;
-min-height: 100svh;
-}
-
-
 </head>
 <body>   
 
@@ -625,7 +580,7 @@ min-height: 100svh;
                 <path id="partialPath" />
             </defs>
             <text dy="-2">
-                <textPath style="font-family: fantasy;" xlink:href="#partialPath" startOffset="12">
+                <textPath style="font-family: fantasy;" xlink:href="#partialPath" startOffset="4">
                     🌹Chúc Mừng Ngày 
                     🌹.........................................................................................................................................🌹Phụ 
                     Nữ Việt Nam 20/10!🌹
